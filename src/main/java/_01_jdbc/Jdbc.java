@@ -15,9 +15,12 @@ public class Jdbc {
 
      static final String PASSWORD="111111";
 
+    Connection connection = null;
+
+    Statement statement = null;
 
     @Before
-    public void init(){
+    public void init() throws Exception{
         System.out.println("建表");
         System.out.println("/*\n" +
                 "SQLyog 企业版 - MySQL GUI v8.14 \n" +
@@ -33,20 +36,26 @@ public class Jdbc {
                 "); \n" +
                 "insert into `student` (`id`, `name`, `age`) values('2','90java','2019-08-20 15:11:22');");
 
+        //注册驱动
+        Class.forName(DRIVER);
+        //连接数据库
+        connection = DriverManager.getConnection(URL, NAME, PASSWORD);
+        //创建Statement对象
+        statement = connection.createStatement();
+
     }
 
 
     @Test
     public void test01() throws Exception{
-        //注册驱动
-        Class.forName(DRIVER);
-        //连接数据库
-        Connection connection = DriverManager.getConnection(URL, NAME, PASSWORD);
-        //创建Statement对象
-        Statement statement = connection.createStatement();
+
         String sql="select * from student";
+        //执行sql
         ResultSet resultSet = statement.executeQuery(sql);
+        //遍历结果
         while (resultSet.next()){
+            //根据行列获取
+            System.out.println("根据行列获取");
             int id = resultSet.getInt(1);
             String name = resultSet.getString(2);
             Timestamp age = resultSet.getTimestamp(3);
@@ -54,6 +63,8 @@ public class Jdbc {
             System.out.println("name:"+name);
             System.out.println("age:"+age);
             System.out.println("------------");
+            //根据表字段查询
+            System.out.println("根据表字段查询");
             int id1 = resultSet.getInt("id");
             String name1 = resultSet.getString("name");
             Timestamp age1 = resultSet.getTimestamp("age");
@@ -63,11 +74,17 @@ public class Jdbc {
             System.out.println("-------------------------------");
         }
         //关闭resultSet
-        resultSet.close();
+        if(resultSet!=null){
+            resultSet.close();
+        }
         //关闭statement
-        statement.close();
+        if(statement!=null){
+            statement.close();
+        }
         //关闭连接
-        connection.close();
+        if(connection!=null){
+            connection.close();
+        }
     }
 
 
