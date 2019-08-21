@@ -68,12 +68,43 @@ public class Jdbc {
     }
 
     /**
-     * 插入
-     * 使用PreparedStatement
+     * 执行插入操作（Statement）
      * @throws Exception
      */
     @Test
     public void test02() throws Exception{
+        String sql = "INSERT INTO student(name,age) VALUES('百度',now())";
+        statement.executeUpdate(sql);
+    }
+
+    /**
+     * 更新（Statement）
+     * @throws Exception
+     */
+    @Test
+    public void test03() throws Exception{
+        String sql = "update student set name ='afeng' where id = 3";
+        statement.executeUpdate(sql);
+    }
+
+    /**
+     * 删除（Statement）
+     * @throws Exception
+     */
+    @Test
+    public void test04() throws Exception{
+        String sql = "delete from student where id = 3";
+        statement.executeUpdate(sql);
+    }
+
+
+
+    /**
+     * 插入(PreparedStatement)
+     * @throws Exception
+     */
+    @Test
+    public void test05() throws Exception{
         String sql = "INSERT INTO student(name,age) VALUES(?,?)";
         //预编译
         preparedStatement = connection.prepareStatement(sql);
@@ -84,14 +115,15 @@ public class Jdbc {
         preparedStatement.setTimestamp(2,timestamp);
         //执行
         preparedStatement.execute();
+        System.out.println(preparedStatement.toString());
     }
 
     /**
-     * 更新操作
+     * 更新操作(PreparedStatement)
      * @throws Exception
      */
     @Test
-    public void test03() throws  Exception{
+    public void test06() throws  Exception{
         String sql = "update student set name =? where id = ?";
         //预编译
         preparedStatement = connection.prepareStatement(sql);
@@ -104,11 +136,11 @@ public class Jdbc {
     }
 
     /**
-     * 删除操作
+     * 删除操作(PreparedStatement)
      * @throws Exception
      */
     @Test
-    public void test04() throws Exception{
+    public void test07() throws Exception{
         String sql = "delete from student where id = ?";
         //获得PreparedStatement对象 预编译
         preparedStatement = connection.prepareStatement(sql);
@@ -118,6 +150,8 @@ public class Jdbc {
         int i = preparedStatement.executeUpdate();
         System.out.println("执行了几条："+i);
     }
+
+
 
 
 

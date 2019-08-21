@@ -1,0 +1,10 @@
+jdbc
+用javaAPI进行操作数据库
+与数据库建立连接----》发送操作语句并处理结果
+
+jdbc执行sql两个对象Statement和PreparedStatement
+从执行过程看以看出Statement执行时sql会将sql拼接好然后去执行。 先编译在执行
+
+PreparedStatement会对sql进行预编译，该sql采用绑定参数 使用?进行占位操作。然后去执行。 预编译 然后每次dbms直接运行sql。
+
+所以多次执行时PreparedStatement效率就会体现出来。
