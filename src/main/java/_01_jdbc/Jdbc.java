@@ -4,18 +4,24 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Date;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 public class Jdbc {
 
-     static final String DRIVER="com.mysql.cj.jdbc.Driver";
+     static String driver;
 
-     static final String URL="jdbc:mysql://192.168.40.128:3306/demo01?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8";
+    static String url;
 
-     static final String NAME="nojava";
+    static String name;
 
-     static final String PASSWORD="111111";
+    static String password;
 
     Connection connection = null;
 
@@ -27,10 +33,17 @@ public class Jdbc {
 
     @Before
     public void init() throws Exception{
+        //从配置文件中读取配置
+        Properties properties = new Properties();
+        properties.load(new FileInputStream("D:\\IdeaProjects\\jdbcdatasource\\src\\main\\resources\\db.properties"));
+        driver = properties.getProperty("driver");
+        url = properties.getProperty("url");
+        name = properties.getProperty("name");
+        password = properties.getProperty("password");
         //注册驱动
-        Class.forName(DRIVER);
+        Class.forName(driver);
         //连接数据库
-        connection = DriverManager.getConnection(URL, NAME, PASSWORD);
+        connection = DriverManager.getConnection(url, name, password);
         //创建Statement对象
         statement = connection.createStatement();
     }
@@ -151,7 +164,121 @@ public class Jdbc {
         System.out.println("执行了几条："+i);
     }
 
+    @Test
+    public void test08() throws Exception{
+        String sql = "select * from student where name = ? and password = ?";
+        preparedStatement = connection.prepareStatement(sql);
+        preparedStatement.setString(1,"xiaoming");
+        String a = "aaa 'or '8=8'";
+        preparedStatement.setString(2,a);
+        resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()){
+            String name = resultSet.getString("name");
+            System.out.println(name);
+        }
+        System.out.println(preparedStatement.toString());
+    }
 
+    /**
+     * 事务测试
+     *  首先需要将事务改为手动提交
+     *  正常情况下会进行插入操作
+     *  异常：分提交前和提交后
+     *  提交前异常 数据库未存入。
+     *  提交后异常 数据库存入
+     * @throws Exception
+     */
+    @Test
+    public void test09() {
+
+        try {
+            //false 关闭默认提交
+            //com.mysql.cj.protocol.a.NativeServerSession.autoCommit     private boolean autoCommit = true; 源码看出默认为true
+            connection.setAutoCommit(false);
+            String sql = "INSERT INTO student(name,age) VALUES(?,?)";
+            //预编译
+            preparedStatement = connection.prepareStatement(sql);
+            //传参
+            preparedStatement.setString(1,"天天向上2");
+            Date date = new Date();
+            Timestamp timestamp = new Timestamp(new Date().getTime());
+            preparedStatement.setTimestamp(2,timestamp);
+            //执行
+            preparedStatement.execute();
+//            int i = 1/0;
+            connection.commit();
+            int i =1/0;
+        } catch (Exception e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 保存点测试
+     * 在保存前设置一个保存点
+     */
+    @Test
+    public void test10 (){
+
+        Savepoint savepoint01 =null;
+        Savepoint savepoint02 =null;
+
+        try {
+            connection.setAutoCommit(false);
+            String sql = "INSERT INTO student(name,age) VALUES(?,?)";
+            //预编译
+            preparedStatement = connection.prepareStatement(sql);
+            savepoint01 = connection.setSavepoint("savepoint01");
+            //传参
+            preparedStatement.setString(1,"天天向上5");
+            Date date = new Date();
+            Timestamp timestamp = new Timestamp(new Date().getTime());
+            preparedStatement.setTimestamp(2,timestamp);
+            //执行
+            preparedStatement.execute();
+
+            //异常
+            int i = 1/0;
+
+            savepoint02 = connection.setSavepoint("savepoint02");
+
+            //传参
+            preparedStatement.setString(1,"天天向上6");
+            Date date1 = new Date();
+            Timestamp timestamp1 = new Timestamp(new Date().getTime());
+            preparedStatement.setTimestamp(2,timestamp1);
+            //执行
+            preparedStatement.execute();
+//            //异常
+//            int i = 1/0;
+            connection.commit();
+        } catch (Exception e) {
+            if(savepoint02!=null){
+                try {
+                    connection.rollback(savepoint02);
+                    connection.commit();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }else if(savepoint01!=null){
+                try {
+                    connection.rollback(savepoint01);
+                    connection.commit();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+
+
+
+
+        }
+    }
 
 
 
