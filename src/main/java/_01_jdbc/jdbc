@@ -9,6 +9,41 @@ PreparedStatement会对sql进行预编译，该sql采用绑定参数 使用?进�
 
 所以多次执行时PreparedStatement效率就会体现出来。
 
+Statement 不能防止sql注入。PreparedStatement可以防止sql注入，
+那么为什么Statement 不能防止sql注入，PreparedStatement可以防止sql注入。
+所谓sql注入就是在表单中传入sql命令。达到欺骗服务器去执行sql命令。
+因为Statement执行sql时直接运行sql，所以通过传参的方式使sql增加查询条件会执行。
+PreparedStatement会对sql进行预编译，通过占位的方式。避免拼接sql。然后进行设置参数。通过preparedStatement.setString  源码可以看出对传入参数当成一个字段的值或者还会对其转义，从而达不到sql注入。
+
+
+数据类型
+
+
 
 事务
 jdbc默认提交事务
+通过connection.setAutoCommit(false); 关闭自动提交事务，默认执行事务。源码参数//com.mysql.cj.protocol.a.NativeServerSession.autoCommit     private boolean autoCommit = true; 源码看出默认为true
+
+
+批处理
+一次向数据库发送多个SQL语句时，可以减少通信开销，从而提高性能。
+Statement和PreparedStatement都可行
+
+
+存储过程
+
+DELIMITER $$
+
+CREATE
+    /*[DEFINER = { user | CURRENT_USER }]*/
+    PROCEDURE `demo01`.`test`(IN p_in INTEGER)
+    /*LANGUAGE SQL
+    | [NOT] DETERMINISTIC
+    | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }
+    | SQL SECURITY { DEFINER | INVOKER }
+    | COMMENT 'string'*/
+    BEGIN
+	DELETE FROM student WHERE id = p_in;
+    END$$
+
+DELIMITER ;

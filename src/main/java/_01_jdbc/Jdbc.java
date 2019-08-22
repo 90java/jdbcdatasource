@@ -31,6 +31,8 @@ public class Jdbc {
 
     PreparedStatement preparedStatement = null;
 
+    CallableStatement callableStatement = null;
+
     @Before
     public void init() throws Exception{
         //从配置文件中读取配置
@@ -219,7 +221,7 @@ public class Jdbc {
 
     /**
      * 保存点测试
-     * 在保存前设置一个保存点
+     * 在保存前设置一个保存点 过程中出现异常时，可以回滚到保存点。然后commit 提交保存点前执行的sql。
      */
     @Test
     public void test10 (){
@@ -272,16 +274,112 @@ public class Jdbc {
                     ex.printStackTrace();
                 }
             }
-
-
-
-
-
         }
     }
 
+    /**
+     * Statement 进行批处理操作
+     * 步骤：
+     */
+    @Test
+    public void test11() throws Exception{
 
+        try {
+            connection.setAutoCommit(false);
+            statement = connection.createStatement();
+            String sql1 = "INSERT INTO student(name,age) VALUES('百度1',now())";
+            statement.addBatch(sql1);
+            String sql2 = "INSERT INTO student(name,age) VALUES('百度2',now())";
+            statement.addBatch(sql2);
+            String sql3 = "INSERT INTO student(name,age) VALUES('百度3',now())";
+            statement.addBatch(sql3);
+            String sql4 = "INSERT INTO student(name,age) VALUES('百度4',now())";
+            statement.addBatch(sql4);
+            String sql5 = "INSERT INTO student(name,age) VALUES('百度5',now())";
+            statement.addBatch(sql5);
+            String sql6 = "INSERT INTO student(name,age) VALUES('百度6',now())";
+            statement.addBatch(sql6);
+            String sql7 = "INSERT INTO student(name,age) VALUES('百度7',now())";
+            statement.addBatch(sql7);
+            String sql8 = "INSERT INTO student(name,age) VALUES('百度8',now())";
+            statement.addBatch(sql8);
+            String sql9 = "INSERT INTO student(name,age) VALUES('百度9',now())";
+            statement.addBatch(sql9);
+            statement.executeBatch();
+            connection.commit();
+        } catch (SQLException e) {
+            connection.rollback();
+        }
 
+    }
+
+    /**
+     * PreparedStatement 进行批处理操作
+     */
+    @Test
+    public void test12(){
+        try {
+            connection.setAutoCommit(false);
+            String sql = "INSERT INTO student(name,age) VALUES(?,?)";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1,"美团1");
+            preparedStatement.setTimestamp(2,new Timestamp(new Date().getTime()));
+            preparedStatement.addBatch();
+            preparedStatement.setString(1,"美团2");
+            preparedStatement.setTimestamp(2,new Timestamp(new Date().getTime()));
+            preparedStatement.addBatch();
+            preparedStatement.setString(1,"美团3");
+            preparedStatement.setTimestamp(2,new Timestamp(new Date().getTime()));
+            preparedStatement.addBatch();
+            preparedStatement.setString(1,"美团4");
+            preparedStatement.setTimestamp(2,new Timestamp(new Date().getTime()));
+            preparedStatement.addBatch();
+            preparedStatement.setString(1,"美团5");
+            preparedStatement.setTimestamp(2,new Timestamp(new Date().getTime()));
+            preparedStatement.addBatch();
+            preparedStatement.setString(1,"美团6");
+            preparedStatement.setTimestamp(2,new Timestamp(new Date().getTime()));
+            preparedStatement.addBatch();
+            preparedStatement.setString(1,"美团7");
+            preparedStatement.setTimestamp(2,new Timestamp(new Date().getTime()));
+            preparedStatement.addBatch();
+            preparedStatement.setString(1,"美团8");
+            preparedStatement.setTimestamp(2,new Timestamp(new Date().getTime()));
+            preparedStatement.addBatch();
+            preparedStatement.setString(1,"美团9");
+            preparedStatement.setTimestamp(2,new Timestamp(new Date().getTime()));
+            preparedStatement.addBatch();
+            preparedStatement.executeBatch();
+            connection.commit();
+        } catch (Exception e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 调用存储过程
+     *  sql 语法为{call PROCEDURE(?,?)}
+     *  1.获得CallableStatement对象
+     *  2.设置参数
+     *  3.执行
+     *  ok
+     */
+    @Test
+    public void test13(){
+        try {
+            String sql = "{call test(?)}";
+            CallableStatement callableStatement = connection.prepareCall(sql);
+            callableStatement.setInt(1,4);
+            callableStatement.execute();
+        } catch (SQLException e) {
+
+        }
+
+    }
 
 
     @After
