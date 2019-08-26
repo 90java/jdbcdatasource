@@ -1,17 +1,13 @@
-package _01_jdbc;
+package com.nojava._01_jdbc;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Date;
-import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 public class Jdbc {
 
