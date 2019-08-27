@@ -2,22 +2,72 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <!--配置文件 包含数据库连接信息 别名-->
+    <!--数据库信息配置文件-->
+    <properties resource="db.properties">
+        <!-- 注意:db.properties文件中的值优先级高 -->
+        <property name="name99" value="111" />
+        <property name="password99" value="111" />
+    </properties>
+
+    <!-- 别名 -->
     <typeAliases>
+        <!--第一种-->
         <typeAlias alias="Student" type="com.nojava.eo.Student" />
+        <!--第二种 @Alias 要和<package name=""/> 你可以不用为每一个JavaBean单独定义别名,你可以为配置出需要取别名的类的所在的包(package)，MyBatis会自动扫描包内定义的类，然后分别为每个类注册一个小写字母开头的简单类名形式的别名。
+        @Alias注解将会覆盖配置文件中的<typeAliases>定义。-->
+        <!--<package name="com.nojava.eo" />-->
+
     </typeAliases>
+    <!--DEV(开发环境)，TEST（测试环境），QA（质量评估环境）,UAT(用户验收环境),PRODUCTION（生产环境）-->
+    <!-- 运行环境 环境默认为dev（开发环境） -->
     <environments default="development">
+        <!--dev开发环境-->
         <environment id="development">
+            <!--事务管理器-->
+            <transactionManager type="JDBC"></transactionManager>
+            <!--dataSource的类型type属性可以配置成其内置类型之一，如UNPOOLED，POOLED，JNDI。-->
+            <dataSource type="POOLED">
+<!--                <property name="driver" value="com.mysql.cj.jdbc.Driver" />-->
+<!--                <property name="url" value="jdbc:mysql://192.168.40.101:3306/demo01?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8" />-->
+<!--                <property name="username" value="nojava" />-->
+<!--                <property name="password" value="111111" />                -->
+                <property name="driver" value="${driver}" />
+                <property name="url" value="${url}" />
+                <property name="username" value="${name}" />
+                <property name="password" value="${password}" />
+            </dataSource>
+        </environment>
+        <!--prod生成环境-->
+        <environment id="test">
             <transactionManager type="JDBC"></transactionManager>
             <dataSource type="POOLED">
-                <property name="driver" value="com.mysql.cj.jdbc.Driver" />
-                <property name="url" value="jdbc:mysql://192.168.40.101:3306/demo01?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;serverTimezone=GMT%2B8" />
-<!--                <property name="driver" value="oracle.jdbc.driver.OracleDriver" />-->
-<!--                <property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:XE" />-->
-                <property name="username" value="nojava" />
-                <property name="password" value="111111" />
+<!--                <property name="driver" value="oracle.jdbc.driver.OracleDriver" />
+                <property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:XE" />
+                <property name="username" value="system" />
+                <property name="password" value="111111" />-->
+                <property name="driver" value="${driver1}" />
+                <property name="url" value="${url1}" />
+                <property name="username" value="${name1}" />
+                <property name="password" value="${password1}" />
+
+            </dataSource>
+        </environment>
+        <environment id="reports">
+            <transactionManager type="MANAGED"></transactionManager>
+            <dataSource type="JNDI">
+                <property name="data_source" value="java:comp/jdbc/ReportsDS" />
             </dataSource>
         </environment>
     </environments>
+    <!--settings元素: 全局参数设置
+    注意:大多数情况下，【这些参数使用它们的默认值即可】
+    为满足应用特定的需求，MyBatis默认的全局参数设置可以被覆盖掉，如下所示：-->
+<!--    <settings>-->
+<!--        <setting name="" value=""/>-->
+<!--    </settings>-->
+
+    <!-- 注册的配置的映射文件 -->
     <mappers>
         <mapper resource="com/nojava/_02_mybatis/StudentMapper.xml" />
     </mappers>

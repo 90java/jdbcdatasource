@@ -16,6 +16,12 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
         </dependency>
+        <!-- 该配置jar包为自己下载并上传至本地仓库通过mvn 注意版本问题-->
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>12.2.0.6</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
         <dependency>
@@ -24,11 +30,22 @@
             <version>8.0.17</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
-            <version>3.4.0</version>
+            <version>3.5.2</version>
         </dependency>
+
+
+        <!-- https://mvnrepository.com/artifact/log4j/log4j -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
+
 
     </dependencies>
 

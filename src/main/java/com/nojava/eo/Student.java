@@ -4,7 +4,7 @@ import java.util.Date;
 
 public class Student {
 
-    private int id;
+    private int stuid;
 
     private String name;
 
@@ -12,12 +12,12 @@ public class Student {
 
     private String password;
 
-    public int getId() {
-        return id;
+    public int getStuid() {
+        return stuid;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setStuid(int stuid) {
+        this.stuid = stuid;
     }
 
     public String getName() {
@@ -47,7 +47,7 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + id +
+                "stuid=" + stuid +
                 ", name='" + name + '\'' +
                 ", age=" + age +
                 ", password='" + password + '\'' +

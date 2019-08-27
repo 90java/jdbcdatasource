@@ -17,6 +17,18 @@ public class MyBatisTest {
 
     InputStream is = null;
 
+    /**
+     * SqlSessionFactory和SqlSession接口
+     * SqlSessionFactory接口的实现类为一个工厂对象，专门生成sqlSession对象。
+     * 生成方式可以为xml生成或者javaapi生成
+     *
+     *
+     * sqlSession接口的实现类时mybatis最重要的一个类，通过该对象动态生成接口的实现类。
+     *
+     * SqlSessionFactory-->SqlSession-->映射接口实现类（执行sql）
+     *
+     */
+
     SqlSessionFactory sqlSessionFactory = null;
 
     SqlSession sqlSession = null;
@@ -35,17 +47,29 @@ public class MyBatisTest {
 
     @Test
     public void test01(){
-//        4.获得StudentMapper的接口实现类对象
+        //4.1获得StudentMapper的接口实现类对象（动态生成StudentMapper实现类） 推荐！！
         StudentMapper mapper = sqlSession.getMapper(StudentMapper.class);
         List<Student> allStudents = mapper.findAllStudents();
-        for(Student s : allStudents){
-            System.out.println(s);
-        }
+//        for(Student s : allStudents){
+//            System.out.println(s);
+//        }
+        Student student = mapper.findStudentById(2);
+        System.out.println(student);
+        System.out.println("-------------------");
+
+
+        //4.2不通过接口生成，而是通过映射文件写好的sql语句
+        Student  o = sqlSession.selectOne("com.nojava._02_mybatis.StudentMapper.findStudentById", 2);
+        System.out.println(o);
+
     }
 
+    /**
+     * 插入晁错
+     * @throws IOException
+     */
     @Test
     public void test02() throws IOException {
-
         try {
             SqlSession sqlSession = SqlSessionFactoryUtil.openSession();
             StudentMapper mapper = sqlSession.getMapper(StudentMapper.class);
@@ -55,23 +79,47 @@ public class MyBatisTest {
             mapper.insertStudent(student);
             sqlSession.commit();
         } catch (IOException e) {
-            e.printStackTrace();
+            sqlSession.rollback();
         } finally {
+            if(sqlSession!=null){
+                sqlSession.close();
+            }
         }
-
     }
 
+    /**
+     * 多环境测试
+     * 生成肯定不会有多种数据库的 测试使用
+     * 注意：一个InputStream不能多个使用，否则报错。
+     */
+    @Test
+    public void test03() throws Exception{
+        InputStream is1 = Resources.getResourceAsStream("mybatis-config.xml");
+        System.out.println("默认-------------");
+        //默认环境
+        SqlSessionFactory build = new SqlSessionFactoryBuilder().build(is1);
+        System.out.println("mysql数据源-------------");
+        //mysql数据库环境
+        InputStream is2 = Resources.getResourceAsStream("mybatis-config.xml");
+        SqlSessionFactory development = new SqlSessionFactoryBuilder().build(is2, "development");
+        SqlSession sqlSessionDev = development.openSession();
+        StudentMapper mapperDev = sqlSessionDev.getMapper(StudentMapper.class);
+        List<Student> allStudentsDev = mapperDev.findAllStudents();
+        for(Student s:allStudentsDev){
+            System.out.println(s);
+        }
 
-
-
-
-
-
-
-
-
-
-
+        System.out.println("oracle数据源-----------------");
+        //oracle数据环境
+        InputStream is3 = Resources.getResourceAsStream("mybatis-config.xml");
+        SqlSessionFactory production = new SqlSessionFactoryBuilder().build(is3, "test");
+        SqlSession sqlSessionProd = production.openSession();
+        StudentMapper mapperProd = sqlSessionProd.getMapper(StudentMapper.class);
+        List<Student> allStudentsProd = mapperProd.findAllStudents();
+        for(Student s:allStudentsProd){
+            System.out.println(s);
+        }
+    }
 
 
     @After
