@@ -14,7 +14,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.1</version>
         </dependency>
         <!-- 该配置jar包为自己下载并上传至本地仓库通过mvn 注意版本问题-->
         <dependency>
